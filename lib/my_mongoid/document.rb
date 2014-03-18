@@ -1,11 +1,13 @@
 require "my_mongoid/attributes"
-
+require "my_mongoid/fields"
+require "my_mongoid/error"
 module MyMongoid
 
   module Document
     extend ActiveSupport::Concern
-    
+
     include MyMongoid::Attributes
+    include MyMongoid::Fields
 
     included do
       MyMongoid.register_model(self)

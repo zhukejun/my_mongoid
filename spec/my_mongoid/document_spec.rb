@@ -14,7 +14,7 @@ describe MyMongoid::Document do
 
   describe ".is_mongoid_model?" do
     it "return true" do
-      expect(event.is_mongoid_model?).to eq(true)
+      expect(event.is_mongoid_model?).to be true
     end
   end
 
@@ -26,14 +26,16 @@ describe MyMongoid::Document do
     end
     context "when initialize argument is not hash" do
       it "should throw ArgumentError " do
-        expect { event.new("abc") }.to raise_error(ArgumentError) 
+        expect {
+          event.new("abc")
+        }.to raise_error(ArgumentError)
       end
     end
   end
 
   describe "#new_record?" do
     it "return true when first new" do
-      expect (event.new({}).new_record?).to eq(true)
+      expect(event.new({}).new_record?).to be true
     end
   end
 
