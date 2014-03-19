@@ -50,15 +50,15 @@ describe MyMongoid::Fields do
     end
 
     it "keys is field name" do
-      expect(event_class.fields.keys).to include(:a)
+      expect(event_class.fields.keys).to include("a")
     end
 
     it "values is MyMongoid::Field object" do
-      expect(event_class.fields[:a]).to be_a(MyMongoid::Field)
+      expect(event_class.fields["a"]).to be_a(MyMongoid::Field)
     end
 
     it "returns a string for Field#name" do
-      field = event_class.fields[:a]
+      field = event_class.fields["a"]
       expect(field.name).to eq("a")
     end
   end

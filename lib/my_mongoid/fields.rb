@@ -8,15 +8,16 @@ module MyMongoid
 
     module ClassMethods
       def field(name)
+        name = name.to_s
         raise MyMongoid::DuplicateFieldError if fields.has_key?(name)
-          define_method(name.to_sym) do
-            attributes[name]
-          end
+        define_method(name.to_sym) do
+          attributes[name]
+        end
 
-          define_method("#{name}=".to_sym) do |value|
-            write_attribute(name, value)
-          end
-          fields[name]=MyMongoid::Field.new(name)
+        define_method("#{name}=".to_sym) do |value|
+          write_attribute(name, value)
+        end
+        fields[name]=MyMongoid::Field.new(name)
 
       end
 
