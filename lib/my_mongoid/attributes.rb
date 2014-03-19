@@ -17,11 +17,11 @@ module MyMongoid
 
     def process_attributes(attr)
       attr.each do |name, value|
-        #write_attribute(name, value)
         name = name.to_s
+        raise MyMongoid::UnknownAttributeError unless respond_to?name 
         send("#{name}=", value)
       end
     end
-
+    alias :attributes= :process_attributes
   end
 end

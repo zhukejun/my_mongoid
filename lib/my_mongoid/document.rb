@@ -23,9 +23,6 @@ module MyMongoid
     def initialize(attrs = {})
       raise ArgumentError unless attrs.is_a?(Hash)
       process_attributes attrs
-      #attrs.each do |name, value|
-      #  attributes[name] = value
-      #end
     end
 
     def new_record?

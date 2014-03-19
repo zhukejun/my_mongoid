@@ -4,4 +4,5 @@ source 'http://ruby.taobao.org'
 gemspec
 group :test do
   gem "rspec", "~> 3.0.0.beta1"
+  gem "guard-rspec"
 end

@@ -41,6 +41,24 @@ describe MyMongoid::Attributes do
       event.process_attributes :number => 10
       expect(event.number).to eq(11)
     end
+
+    it "raise MyMongoid::UnknownAttributeError" do
+      expect {
+        event.process_attributes({:a => 2, :number => 12})
+      }.to raise_error MyMongoid::UnknownAttributeError
+
+      expect {
+        event.process_attributes :unknown => 2
+      }.to raise_error MyMongoid::UnknownAttributeError
+    end
+  end
+
+  describe "#attributes=" do
+    it " an alias of #process_attributes" do
+      expect(event).to respond_to(:attributes=)
+      event.attributes = { :number => 13 }
+      expect(event.number).to eq(14)
+    end
   end
 
 end

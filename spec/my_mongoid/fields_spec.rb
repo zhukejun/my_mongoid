@@ -3,10 +3,11 @@ describe MyMongoid::Fields do
     Class.new {
       include MyMongoid::Document
 
-      field :a
+      field :a, :as => :n
       field :b
     }
   }
+
 
   describe ".field" do
     it "can declare a field using 'field' DSL" do
@@ -18,6 +19,22 @@ describe MyMongoid::Fields do
         event_class.send(:field,:a)
       }.to raise_error(MyMongoid::DuplicateFieldError)
     end
+
+    context "parse options" do
+      it "store the field options in Field object" do
+        expect(event_class.fields["a"].options).to include(:as => :n)
+      end
+
+      it 'aliiases a field with :as option' do
+        event = event_class.new(:a => 10)
+        expect(event.a).to eq(10)
+        expect(event.n).to eq(10)
+        event.n=20
+        expect(event.a).to eq(20)
+        expect(event.n).to eq(20)
+      end
+    end
+
   end
 
   describe "generate accessors" do

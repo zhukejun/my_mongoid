@@ -7,7 +7,7 @@ module MyMongoid
     end
 
     module ClassMethods
-      def field(name)
+      def field(name,options={})
         name = name.to_s
         raise MyMongoid::DuplicateFieldError if fields.has_key?(name)
         define_method(name.to_sym) do
@@ -17,7 +17,7 @@ module MyMongoid
         define_method("#{name}=".to_sym) do |value|
           write_attribute(name, value)
         end
-        fields[name]=MyMongoid::Field.new(name)
+        fields[name]=MyMongoid::Field.new(name,options)
 
       end
 
@@ -29,8 +29,10 @@ module MyMongoid
 
   class Field
     attr_reader :name
-    def initialize(name)
+    attr_reader :options
+    def initialize(name,options={})
       @name=name.to_s
+      @options=options
     end
   end
 end
