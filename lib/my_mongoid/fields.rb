@@ -3,7 +3,7 @@ module MyMongoid
     extend ActiveSupport::Concern
 
     included do
-      field :_id
+      field :_id, :as => :id
     end
 
     module ClassMethods
@@ -11,7 +11,7 @@ module MyMongoid
         name = name.to_s
         raise MyMongoid::DuplicateFieldError if fields.has_key?(name)
         define_method(name.to_sym) do
-          attributes[name]
+          attributes[name] ||= self.class.default_attributes[name]
         end
 
         define_method("#{name}=".to_sym) do |value|
@@ -19,6 +19,28 @@ module MyMongoid
         end
         fields[name]=MyMongoid::Field.new(name,options)
 
+        if options.has_key?(:as)
+          alias_method options[:as].to_sym, name.to_sym
+          alias_method "#{options[:as]}=".to_sym, "#{name}=".to_sym
+        end
+
+        if options.has_key?(:default)
+          default_attributes[name] = options[:default]
+        end
+
+        if options.has_key?(:type)
+          attribute_types[name] = options[:type]
+        end
+
+
+      end
+
+      def attribute_types
+        @attribute_types ||= {}
+      end
+
+      def default_attributes
+        @default_attributes ||= {}
       end
 
       def fields

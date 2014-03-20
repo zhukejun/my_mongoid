@@ -4,7 +4,8 @@ describe MyMongoid::Fields do
       include MyMongoid::Document
 
       field :a, :as => :n
-      field :b
+      field :b, :default => "normal"
+      field :time, :type => Time
     }
   }
 
@@ -33,8 +34,25 @@ describe MyMongoid::Fields do
         expect(event.a).to eq(20)
         expect(event.n).to eq(20)
       end
-    end
 
+      it 'add field default value' do
+        expect(event_class.new({}).b).to eq("normal")
+      end
+
+      context "when add filed type options" do
+        it 'Raise an error if type mismatches' do
+          expect {
+            event_class.new(:time => 10)
+          }.to raise_error MyMongoid::AttributeTypeError
+        end
+
+        it 'not raise error if type matches' do
+          expect {
+            event_class.new(:time => Time.now)
+          }.to_not raise_error
+        end
+      end
+   end
   end
 
   describe "generate accessors" do
@@ -84,6 +102,10 @@ describe MyMongoid::Fields do
     it "All models should have the _id field automatically declared" do
       expect(event_class.new({})).to respond_to(:_id)
     end
+    it 'make id the alias for _id ' do
+      expect(event_class.new({})).to respond_to(:id)
+    end
+
   end
 
 end

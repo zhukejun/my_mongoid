@@ -23,6 +23,7 @@ module MyMongoid
     def initialize(attrs = {})
       raise ArgumentError unless attrs.is_a?(Hash)
       process_attributes attrs
+      yield self if block_given?
     end
 
     def new_record?

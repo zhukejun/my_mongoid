@@ -2,6 +2,7 @@ describe MyMongoid::Document do
   let(:event) {
     Class.new {
       include MyMongoid::Document
+      field :created_at
     }
   }
 
@@ -19,17 +20,23 @@ describe MyMongoid::Document do
   end
 
   describe ".new" do
-    context "when initialize a Mongoid model with atrrtibutes" do
-      it "can instantiate a model with hash attributes" do
-        expect(event.new({})).to be_an(event)
-      end
+    it "can instantiate a model with hash attributes" do
+      expect(event.new({})).to be_an(event)
     end
-    context "when initialize argument is not hash" do
-      it "should throw ArgumentError " do
-        expect {
-          event.new("abc")
-        }.to raise_error(ArgumentError)
+
+    it "should throw ArgumentError " do
+      expect {
+        event.new("abc")
+      }.to raise_error(ArgumentError)
+    end
+
+    it "should correct init" do
+      data={"created_at"=>"2014-02-13T03:20:37Z"}
+      e = event.new(data) do |e|
+        e.created_at = Time.parse(data["created_at"])
       end
+
+      expect(e.created_at).to eq(Time.parse("2014-02-13T03:20:37Z"))
     end
   end
 
