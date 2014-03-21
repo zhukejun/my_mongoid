@@ -7,32 +7,8 @@ module MyMongoid
     end
 
     module ClassMethods
-      def field(name,options={})
-        name = name.to_s
-        raise MyMongoid::DuplicateFieldError if fields.has_key?(name)
-        define_method(name.to_sym) do
-          attributes[name] ||= self.class.default_attributes[name]
-        end
-
-        define_method("#{name}=".to_sym) do |value|
-          write_attribute(name, value)
-        end
-        fields[name]=MyMongoid::Field.new(name,options)
-
-        if options.has_key?(:as)
-          alias_method options[:as].to_sym, name.to_sym
-          alias_method "#{options[:as]}=".to_sym, "#{name}=".to_sym
-        end
-
-        if options.has_key?(:default)
-          default_attributes[name] = options[:default]
-        end
-
-        if options.has_key?(:type)
-          attribute_types[name] = options[:type]
-        end
-
-
+      def field(name, options = {})
+        add_field(name, options)
       end
 
       def attribute_types
@@ -45,6 +21,51 @@ module MyMongoid
 
       def fields
         @fields ||= {}
+      end
+
+      protected
+      def add_field(name, options)
+        name = name.to_s
+        raise MyMongoid::DuplicateFieldError if fields.has_key?(name)
+        create_accessor(name)
+        fields[name]=MyMongoid::Field.new(name,options)
+        parse_options(name,options)
+      end
+
+      def create_accessor(name)
+        create_getter(name)
+        create_setter(name)
+      end
+
+      def create_getter(name)
+        define_method(name.to_sym) do
+          attributes[name] ||= self.class.default_attributes[name]
+        end
+      end
+
+      def create_setter(name)
+        define_method("#{name}=".to_sym) do |value|
+          write_attribute(name, value)
+        end
+      end
+
+      def parse_options(name, options)
+        options.each do |k, v|
+          case k
+          when :as
+            define_alias_method(v, name)
+          when :default
+            default_attributes[name] = v
+          when :type
+            attribute_types[name] = v
+          else
+          end
+        end
+      end
+
+      def define_alias_method(new_name, name)
+        alias_method new_name.to_sym, name.to_sym
+        alias_method "#{new_name}=".to_sym, "#{name}=".to_sym
       end
     end
   end
