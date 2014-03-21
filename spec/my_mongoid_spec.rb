@@ -13,4 +13,18 @@ describe MyMongoid do
       expect(MyMongoid.models).to include(model)
     end
   end
+
+  describe ".configuration" do
+    it " return the MyMongoid::Configuration singleton" do
+      expect(MyMongoid.configuration).to be_a(MyMongoid::Configuration)
+    end
+  end
+
+  describe ".configure" do
+    it "should yield MyMongoid.configuration to a block" do
+      MyMongoid.configure do |c|
+        expect(c).to eq(MyMongoid.configuration)
+      end
+    end
+  end
 end

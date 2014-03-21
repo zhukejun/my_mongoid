@@ -2,6 +2,7 @@ require "active_support/core_ext"
 
 require "my_mongoid/version"
 require "my_mongoid/document"
+require "my_mongoid/configuration"
 
 module MyMongoid
   # Your code goes here...
@@ -12,6 +13,14 @@ module MyMongoid
 
     def register_model(name)
       models << name unless models.include?(name)
+    end
+
+    def configuration
+      Configuration.instance
+    end
+
+    def configure
+      yield configuration if block_given?
     end
   end
 end
