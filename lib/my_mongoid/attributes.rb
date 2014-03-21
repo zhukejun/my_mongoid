@@ -20,7 +20,7 @@ module MyMongoid
     def process_attributes(attr)
       attr.each do |name, value|
         name = name.to_s
-        raise MyMongoid::UnknownAttributeError unless respond_to?name 
+        raise MyMongoid::UnknownAttributeError unless respond_to?name
         send("#{name}=", value)
       end
     end
