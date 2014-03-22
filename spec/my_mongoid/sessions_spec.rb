@@ -1,4 +1,11 @@
-describe "MyMongoid.session" do
+describe "MyMongoid::Sessions" do
+
+  before(:all) do
+    MyMongoid.configure do |config|
+      config.database = "my_mongoid"
+      config.host = "localhost:27017"
+    end
+  end
 
 
   it "should return a Moped::Session" do
@@ -10,6 +17,11 @@ describe "MyMongoid.session" do
   end
 
   it "raise MyMongoid::UnconfiguredDatabaseError if host and database are not configured" do
+
+    MyMongoid.configure do |config|
+      config.database =  "my_mongoid"
+      config.host = nil
+    end
     expect {
       MyMongoid.session
     }.to raise_error MyMongoid::UnconfiguredDatabaseError
