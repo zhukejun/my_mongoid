@@ -102,7 +102,16 @@ module MyMongoid
 
     def update_attributes(attrs={})
       selector = {"_id" => id}
-      self.class.collection.find(selector).update("$set" => attrs)
+      self.class.collection.find(selector).update( attrs)
+    end
+
+    def delete
+      self.class.collection.find({"_id" => self.id}).remove
+      @deleted = true
+    end
+
+    def deleted?
+      @deleted ||= false
     end
 
   end
