@@ -23,7 +23,7 @@ module MyMongoid
       if self.class.attribute_types.has_key?(name)
         raise MyMongoid::AttributeTypeError unless value.is_a?(self.class.attribute_types[name])
       end
-      changed_attributes[name] = attributes[name] if attributes.has_key?(name) && attributes[name] != value
+      changed_attributes[name] = [attributes[name],value] if attributes.has_key?(name) && attributes[name] != value && name!="_id"
       attributes[name] = value
     end
 

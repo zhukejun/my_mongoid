@@ -65,8 +65,12 @@ module MyMongoid
 
     def save
 
-      self._id = BSON::ObjectId.new unless self._id
-      self.class.collection.insert(to_document)
+      if new_record?
+        self._id = BSON::ObjectId.new unless self._id
+        self.class.collection.insert(to_document)
+      else
+        self.class.collection.find({"_id" => self.id}).first.update({"$set" => atomic_updates})
+      end
       @is_new_record = false
       clear_changed_attributes
       true
@@ -78,9 +82,27 @@ module MyMongoid
 
     def atomic_updates
       if changed?
+        d={}
+        changed_attributes.each do |k,v|
+          d[k]=v[1]
+        end
+        d
       else
         {}
       end
+    end
+
+    def update_document
+      updates = atomic_updates
+
+      unless updates.empty?
+        update_attributes(updates)
+      end
+    end
+
+    def update_attributes(attrs={})
+      selector = {"_id" => id}
+      self.class.collection.find(selector).update("$set" => attrs)
     end
 
   end

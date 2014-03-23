@@ -109,6 +109,16 @@ describe MyMongoid::Document do
         event.save
         expect(event.changed?).to eq(false)
       end
+
+      it "should save the changes if a document is already persited" do
+        event = Event.new({:created_at => "ff"})
+        event.save
+        id = event.id
+        event.created_at = "newzkj"
+        event.save
+        expect(event.id).to eq(id)
+        expect(event.created_at).to eq("newzkj")
+      end
     end
   end
 
@@ -175,7 +185,7 @@ describe MyMongoid::Document do
 
     it "should keep the original attribute values" do
       event.created_at = "xyp"
-      expect(event.changed_attributes["created_at"]).to eq("zkj")
+      expect(event.changed_attributes["created_at"][0]).to eq("zkj")
     end
 
     it "should not make a field dirty if the assigned value is equaled to the old value"do
@@ -199,19 +209,62 @@ describe MyMongoid::Document do
   describe "#atomic_updates" do
     it "should return {} if nothing changed" do
       e = Event.new(created_at: "A")
+      e.save
       expect(e.atomic_updates).to eq({})
     end
 
     it "should return {} if record is not a persisted document" do
       e = Event.new(created_at: "A")
+      expect(e.atomic_updates).to eq({})
     end
 
     it "should generate the $set update operation to update a persisted document" do
       e = Event.new(created_at: "A")
+      e.save
+      e.created_at = "C"
+      expect(e.atomic_updates).to eq({"created_at" => "C"})
     end
 
-
-
+    it "should not consider id" do
+      e = Event.new(created_at: "A")
+      e.id = "123"
+      expect(e.atomic_updates).to eq({})
+    end
   end
+
+  describe '#update_document' do
+    it 'should not issue query if nothing changed' do
+      obj = Event.create(created_at: "foo")
+      expect(obj).not_to receive(:update_attributes)
+      obj.update_document
+    end
+    it 'should update the document in database if there are changes' do
+      obj = Event.create(created_at: "foo")
+      expect(obj).to receive(:update_attributes).with({"created_at" => "abc"})
+      obj.created_at = "abc"
+      obj.update_document
+    end
+  end
+
+  describe '#update_attributes zkj' do
+    it "should change and persiste attributes of a record" do
+      obj = Event.create(created_at: "foo")
+      obj.save
+      expect(obj.update_attributes(created_at: "xoo")).to eq("xoo")
+      expect(obj.created_at).to eq("xoo")
+    end
+  end
+
+  describe '#update_attributes' do
+    it 'calls update method of obj' do
+      coll = Event.collection
+      obj = Event.create(created_at: "foo")
+      expect(Event).to receive(:collection).and_return(coll)
+      expect(coll).to receive(:find).with({"_id" => obj.id}).and_return(obj)
+      expect(obj).to receive(:update).with({created_at: "abc"})
+      obj.update_attributes(created_at: "abc")
+    end
+  end
+
 
 end
