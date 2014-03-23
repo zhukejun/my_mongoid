@@ -1,5 +1,14 @@
 module MyMongoid
   module Attributes
+
+    def clear_changed_attributes
+      @changed_attributes = {}
+    end
+
+    def changed_attributes
+      @changed_attributes ||= {}
+    end
+
     def attributes
       @attributes ||= {}
     end
@@ -14,6 +23,7 @@ module MyMongoid
       if self.class.attribute_types.has_key?(name)
         raise MyMongoid::AttributeTypeError unless value.is_a?(self.class.attribute_types[name])
       end
+      changed_attributes[name] = attributes[name] if attributes.has_key?(name) && attributes[name] != value
       attributes[name] = value
     end
 

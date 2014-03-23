@@ -68,7 +68,19 @@ module MyMongoid
       self._id = BSON::ObjectId.new unless self._id
       self.class.collection.insert(to_document)
       @is_new_record = false
+      clear_changed_attributes
       true
+    end
+
+    def changed?
+      !changed_attributes.empty?
+    end
+
+    def atomic_updates
+      if changed?
+      else
+        {}
+      end
     end
 
   end

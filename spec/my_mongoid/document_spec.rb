@@ -103,6 +103,12 @@ describe MyMongoid::Document do
         expect(event.id).to be_a(BSON::ObjectId)
         expect(Event.collection.find({"_id" => event.id}).count).to eq(1)
       end
+
+      it "should have no changes right after persisting" do
+        event = Event.new({:created_at => "zkj"})
+        event.save
+        expect(event.changed?).to eq(false)
+      end
     end
   end
 
@@ -152,6 +158,59 @@ describe MyMongoid::Document do
       Event.create
       expect { Event.find(1) }.to raise_error MyMongoid::RecordNotFoundError
     end
+  end
+
+  describe "#changed_attributes" do
+    let(:event) {
+      Event.new({"created_at" => "zkj"})
+    }
+    it "should be an empty hash initially" do
+      expect(event.changed_attributes).to be_a(Hash)
+    end
+
+    it "should track writes to attributes" do
+      event.created_at = "xyp"
+      expect(event.changed_attributes.keys).to include("created_at")
+    end
+
+    it "should keep the original attribute values" do
+      event.created_at = "xyp"
+      expect(event.changed_attributes["created_at"]).to eq("zkj")
+    end
+
+    it "should not make a field dirty if the assigned value is equaled to the old value"do
+      event.created_at = "zkj"
+      expect(event.changed_attributes.keys).to_not include("created_at")
+    end
+  end
+
+  describe "#changed?" do
+    it 'should be false for a newly instantiated record' do
+      e = Event.new(created_at: "A")
+      expect(e.changed?).to be false
+    end
+    it "should be true if a field changed" do
+      e = Event.new(created_at: "A")
+      e.created_at = "C"
+      expect(e.changed?).to be true
+    end
+  end
+
+  describe "#atomic_updates" do
+    it "should return {} if nothing changed" do
+      e = Event.new(created_at: "A")
+      expect(e.atomic_updates).to eq({})
+    end
+
+    it "should return {} if record is not a persisted document" do
+      e = Event.new(created_at: "A")
+    end
+
+    it "should generate the $set update operation to update a persisted document" do
+      e = Event.new(created_at: "A")
+    end
+
+
 
   end
 
