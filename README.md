@@ -1,3 +1,5 @@
+
+[![Build Status](https://travis-ci.org/zhukejun/my_mongoid.svg)](https://travis-ci.org/zhukejun/my_mongoid)
 # MyMongoid
 
 TODO: Write a gem description
