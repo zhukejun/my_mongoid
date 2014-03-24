@@ -69,7 +69,7 @@ module MyMongoid
         self._id = BSON::ObjectId.new unless self._id
         self.class.collection.insert(to_document)
       else
-        self.class.collection.find({"_id" => self.id}).first.update({"$set" => atomic_updates})
+        self.class.collection.find({"_id" => id}).first.update({"$set" => atomic_updates})
       end
       @is_new_record = false
       clear_changed_attributes
@@ -102,7 +102,8 @@ module MyMongoid
 
     def update_attributes(attrs={})
       selector = {"_id" => id}
-      self.class.collection.find(selector).update( attrs)
+      process_attributes(attrs)
+      self.class.collection.find(selector).update({"$set" => atomic_updates})
     end
 
     def delete

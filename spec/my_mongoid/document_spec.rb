@@ -246,25 +246,27 @@ describe MyMongoid::Document do
     end
   end
 
-  # describe '#update_attributes zkj' do
-  #   it "should change and persiste attributes of a record" do
-  #     obj = Event.create(created_at: "foo")
-  #     obj.save
-  #     expect(obj.update_attributes(created_at: "xoo")).to eq("xoo")
-  #     expect(obj.created_at).to eq("xoo")
-  #   end
-  # end
-
-  describe '#update_attributes' do
-    it 'calls update method of obj' do
-      coll = Event.collection
+  describe '#update_attributes zkj' do
+    it "should change and persiste attributes of a record" do
       obj = Event.create(created_at: "foo")
-      expect(Event).to receive(:collection).and_return(coll)
-      expect(coll).to receive(:find).with({"_id" => obj.id}).and_return(obj)
-      expect(obj).to receive(:update).with({created_at: "abc"})
-      obj.update_attributes(created_at: "abc")
+      obj.save
+      obj.update_attributes(created_at: "xoo")
+      expect(obj.created_at).to eq("xoo")
+      new = Event.find(obj.id)
+      expect(new.created_at).to eq("xoo")
     end
   end
+
+  # describe '#update_attributes' do
+  #   it 'calls update method of obj' do
+  #     coll = Event.collection
+  #     obj = Event.create(created_at: "foo")
+  #     expect(Event).to receive(:collection).and_return(coll)
+  #     expect(coll).to receive(:find).with({"_id" => obj.id}).and_return(obj)
+  #     expect(obj).to receive(:update).with({created_at: "abc"})
+  #     obj.update_attributes(created_at: "abc")
+  #   end
+  # end
 
   describe "#delete" do
     it "should delete a record from db" do
