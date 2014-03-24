@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+
 describe MyMongoid do
   let(:model) {
     Class.new {
